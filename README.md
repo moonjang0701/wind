@@ -62,14 +62,25 @@ from src.crosswind_simulator import CrosswindSimulator
 simulator = CrosswindSimulator(
     aircraft_model="c172p",  # Cessna 172
     crosswind_speed=10.0,     # 10 m/s 횡풍
-    crosswind_direction=90.0  # 90도 (정측풍)
+    crosswind_direction=90.0, # 90도 (정측풍)
+    dt=0.01                   # 시간 간격 (초)
 )
 
 # 시뮬레이션 실행 (60초간)
 results = simulator.run_simulation(duration=60.0)
 
-# 결과 시각화
-simulator.plot_results(results)
+# 결과 출력
+print(f"최대 편차: {results['lateral_deviation_m'].max():.2f}m")
+```
+
+### 빠른 시뮬레이션 (dt=1초)
+```python
+# 계산 간격을 1초로 설정 (100배 빠름!)
+simulator = CrosswindSimulator(
+    crosswind_speed=10.0,
+    dt=1.0  # 1초 간격 (60초 = 60 스텝만 계산)
+)
+results = simulator.run_simulation(duration=60.0)
 ```
 
 ### 고급 사용 예제
