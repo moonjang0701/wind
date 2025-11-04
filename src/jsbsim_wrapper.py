@@ -87,23 +87,51 @@ class JSBSimWrapper:
     
     def _initialize_conditions(self):
         """초기 비행 조건 설정"""
-        ic = self.fdm.get_ic()
-        
-        # 초기 위치 설정 (샌프란시스코 국제공항 근처)
-        ic.set_longitude_deg(-122.3748)
-        ic.set_latitude_deg(37.6189)
-        ic.set_altitude_ft_agl(self.init_altitude)
-        
-        # 초기 자세 설정 (수평 비행)
-        ic.set_phi_deg(0.0)    # Roll
-        ic.set_theta_deg(0.0)  # Pitch
-        ic.set_psi_deg(0.0)    # Yaw (북쪽 방향)
-        
-        # 초기 속도 설정
-        ic.set_v_calibrated_kts(self.init_airspeed)
-        ic.set_v_north_fps(0.0)
-        ic.set_v_east_fps(0.0)
-        ic.set_v_down_fps(0.0)
+        # JSBSim API 버전에 따라 다른 방법 시도
+        try:
+            # 새로운 API (property 기반)
+            # 초기 위치 설정 (샌프란시스코 국제공항 근처)
+            self.fdm.set_property_value("ic/long-gc-deg", -122.3748)
+            self.fdm.set_property_value("ic/lat-geod-deg", 37.6189)
+            self.fdm.set_property_value("ic/h-agl-ft", self.init_altitude)
+            
+            # 초기 자세 설정 (수평 비행)
+            self.fdm.set_property_value("ic/phi-deg", 0.0)    # Roll
+            self.fdm.set_property_value("ic/theta-deg", 0.0)  # Pitch
+            self.fdm.set_property_value("ic/psi-true-deg", 0.0)  # Yaw (북쪽 방향)
+            
+            # 초기 속도 설정
+            self.fdm.set_property_value("ic/vc-kts", self.init_airspeed)
+            self.fdm.set_property_value("ic/vn-fps", 0.0)
+            self.fdm.set_property_value("ic/ve-fps", 0.0)
+            self.fdm.set_property_value("ic/vd-fps", 0.0)
+            
+            # 초기 조건 실행
+            self.fdm.run_ic()
+            
+        except Exception as e:
+            logger.warning(f"Property 기반 초기화 실패, 구 방식 시도: {e}")
+            try:
+                # 구 API (get_ic 사용)
+                ic = self.fdm.get_ic()
+                
+                # 초기 위치 설정
+                ic.set_longitude_deg(-122.3748)
+                ic.set_latitude_deg(37.6189)
+                ic.set_altitude_ft_agl(self.init_altitude)
+                
+                # 초기 자세 설정
+                ic.set_phi_deg(0.0)
+                ic.set_theta_deg(0.0)
+                ic.set_psi_deg(0.0)
+                
+                # 초기 속도 설정
+                ic.set_v_calibrated_kts(self.init_airspeed)
+                ic.set_v_north_fps(0.0)
+                ic.set_v_east_fps(0.0)
+                ic.set_v_down_fps(0.0)
+            except Exception as e2:
+                logger.error(f"초기 조건 설정 실패: {e2}")
         
         # 엔진 시동
         self.fdm.set_property_value("propulsion/engine[0]/set-running", 1)
