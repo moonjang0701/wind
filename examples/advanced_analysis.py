@@ -36,9 +36,28 @@ def main():
     duration = 60.0  # 60초
     aircraft = "c172p"
     
-    logger.info(f"분석할 풍속: {wind_speeds} m/s")
-    logger.info(f"항공기: {aircraft}")
-    logger.info(f"각 시뮬레이션 시간: {duration}초")
+    logger.info("")
+    logger.info("【비교 분석 조건】")
+    logger.info(f"✈️  항공기: {aircraft} (Cessna 172)")
+    logger.info(f"📍 위치: 샌프란시스코(SFO) 상공")
+    logger.info(f"🧭 비행 방향: 북쪽 (0°)")
+    logger.info(f"⚡ 비행 속도: 60 knots (111 km/h)")
+    logger.info(f"🏔️  고도: 1,000 feet (305 m)")
+    logger.info(f"⏱️  각 시뮬레이션: {duration}초")
+    logger.info("")
+    logger.info("【비교할 횡풍 조건】")
+    for ws in wind_speeds:
+        kmh = ws * 3.6
+        knots = ws * 1.94384
+        if ws <= 5:
+            level = "🍃 약한 바람"
+        elif ws <= 10:
+            level = "🌬️  보통 바람"
+        elif ws <= 15:
+            level = "💨 강한 바람"
+        else:
+            level = "🌪️  매우 강한 바람"
+        logger.info(f"  {ws:2d} m/s = {kmh:5.1f} km/h = {knots:5.1f} knots - {level}")
     logger.info("")
     
     try:

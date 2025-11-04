@@ -30,16 +30,35 @@ def main():
     logger.info("JSBSim 횡풍 좌우편차 시뮬레이션 - 기본 예제")
     logger.info("=" * 60)
     
-    # 시뮬레이션 파라미터 설정
-    aircraft = "c172p"  # Cessna 172
-    crosswind_speed = 10.0  # 10 m/s (약 19.4 knots)
-    crosswind_direction = 90.0  # 동쪽에서 부는 바람 (순수 횡풍)
-    duration = 60.0  # 60초간 시뮬레이션
+    # ========================================
+    # 시뮬레이션 조건 설정
+    # ========================================
     
-    logger.info(f"항공기: {aircraft}")
-    logger.info(f"횡풍 속도: {crosswind_speed} m/s")
-    logger.info(f"풍향: {crosswind_direction}°")
-    logger.info(f"시뮬레이션 시간: {duration}초")
+    # 항공기
+    aircraft = "c172p"  # Cessna 172P (4인승 경량 항공기)
+    
+    # 횡풍 조건
+    crosswind_speed = 10.0  # 10 m/s = 36 km/h = 19.4 knots (보통 강도)
+    crosswind_direction = 90.0  # 90° = 동쪽에서 부는 바람 (순수 횡풍)
+    
+    # 비행 조건 (자동 설정됨)
+    # - 출발 위치: 샌프란시스코 국제공항(SFO) 근처
+    # - 비행 방향: 북쪽 (0°)
+    # - 초기 고도: 1,000 feet (305m)
+    # - 비행 속도: 60 knots (111 km/h)
+    
+    duration = 60.0  # 시뮬레이션 시간: 60초
+    
+    logger.info("")
+    logger.info("【시뮬레이션 조건】")
+    logger.info(f"📍 위치: 샌프란시스코(SFO) 상공")
+    logger.info(f"✈️  항공기: {aircraft} (Cessna 172)")
+    logger.info(f"🧭 비행 방향: 북쪽 (0°)")
+    logger.info(f"⚡ 비행 속도: 60 knots (111 km/h)")
+    logger.info(f"🏔️  고도: 1,000 feet (305 m)")
+    logger.info(f"🌬️  횡풍: {crosswind_speed} m/s ({crosswind_speed * 3.6:.1f} km/h)")
+    logger.info(f"🌀 풍향: {crosswind_direction}° (동풍 - 순수 횡풍)")
+    logger.info(f"⏱️  시간: {duration}초")
     logger.info("")
     
     try:
@@ -66,7 +85,7 @@ def main():
         # 결과 요약 출력
         logger.info("")
         logger.info("=" * 60)
-        logger.info("시뮬레이션 결과 요약")
+        logger.info("【시뮬레이션 결과】")
         logger.info("=" * 60)
         
         max_deviation = results['lateral_deviation_m'].abs().max()
@@ -74,12 +93,21 @@ def main():
         mean_drift = results['drift_angle_deg'].mean()
         max_drift = results['drift_angle_deg'].abs().max()
         total_distance = results['total_distance_m'].iloc[-1]
+        final_altitude = results['altitude_agl_ft'].iloc[-1]
+        avg_groundspeed = results['groundspeed_kts'].mean()
         
-        logger.info(f"최대 측면 편차: {max_deviation:.2f} m")
-        logger.info(f"최종 측면 편차: {final_deviation:.2f} m")
-        logger.info(f"평균 편류각: {mean_drift:.2f}°")
-        logger.info(f"최대 편류각: {max_drift:.2f}°")
-        logger.info(f"총 이동 거리: {total_distance:.0f} m")
+        logger.info(f"📏 최대 측면 편차: {max_deviation:.2f} m (의도한 경로에서 벗어난 최대 거리)")
+        logger.info(f"📍 최종 측면 편차: {final_deviation:.2f} m (60초 후 동쪽으로 밀린 거리)")
+        logger.info(f"📐 평균 편류각: {mean_drift:.2f}° (바람을 보정하기 위한 기수 각도)")
+        logger.info(f"📐 최대 편류각: {max_drift:.2f}°")
+        logger.info(f"📍 총 이동 거리: {total_distance:.0f} m (실제로 이동한 직선 거리)")
+        logger.info(f"🏔️  최종 고도: {final_altitude:.0f} feet ({final_altitude * 0.3048:.0f} m)")
+        logger.info(f"⚡ 평균 대지속도: {avg_groundspeed:.1f} knots ({avg_groundspeed * 1.852:.1f} km/h)")
+        logger.info("")
+        logger.info("💡 해석:")
+        logger.info(f"   → 항공기가 북쪽으로 비행하려 했지만,")
+        logger.info(f"   → 동쪽에서 부는 {crosswind_speed} m/s 바람 때문에")
+        logger.info(f"   → 60초 동안 동쪽으로 약 {final_deviation:.0f}m 밀려났습니다.")
         logger.info("")
         
         # 결과 저장
