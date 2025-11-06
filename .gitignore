@@ -68,3 +68,15 @@ jsbsim.log
 # OS
 Thumbs.db
 .DS_Store
+
+# Shapefile and KML data
+*.zip
+*.shp
+*.shx
+*.dbf
+*.prj
+*.fix
+*.kml
+D162/
+D164/
+conversion*.log
